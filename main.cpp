@@ -6,7 +6,7 @@
 using namespace::boost::asio;  
 using namespace std;
 
-#define PORT "/dev/ttyACM1"
+#define PORT "/dev/ttyACM0"
 
 // Base serial settings
 serial_port_base::baud_rate BAUD(9600);
@@ -76,11 +76,8 @@ void serialcom()
 
 void visualcontrol()
 {
-    
-
-    
-    
-    
+  
+  ypos=123;
 }
 
 int main() 
