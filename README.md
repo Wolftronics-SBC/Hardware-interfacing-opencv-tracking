@@ -16,6 +16,15 @@ Make sure you g++ with correct links to boost dir.
 g++ main.cpp -isystem /usr/include/boost -L/usr/include/ -lboost_system -std=gnu++11 -pthread -o test
 ```
 
+
+### How to run ?
+
+``` 
+./run.sh
+```
+
+
+
 #### Potential run-time errors
 ```
 terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> >'
