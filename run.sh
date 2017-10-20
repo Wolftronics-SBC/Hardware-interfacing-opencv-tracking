@@ -1,7 +1,8 @@
 #!/bin/bash
-# My first script
+#Compile and Run main.cpp
 
-echo "Compling Files...."
+echo "Compiling Files...."
 g++ main.cpp -isystem /usr/include/boost -L/usr/include/ -lboost_system -std=gnu++11 -pthread -o test
+echo "Just created executable test ...."
 echo "Running ..."
 ./test
