@@ -15,27 +15,25 @@ serial_port_base::parity PARITY( serial_port_base::parity::none );
 // serial_port_base::stop_bits STOP( serial_port_base::stop_bits::one );
 serial_port_base::stop_bits STOP( serial_port_base::stop_bits::one );
 
+//CROSS THREAD COM'S
 volatile int ypos = 0;
 
 void serialcom() 
 {
- io_service io;
+  io_service io;
   serial_port port( io, PORT );
-
   // Setup port - base settings
   port.set_option( BAUD );
   port.set_option( FLOW );
   port.set_option( PARITY );
   port.set_option( STOP );
-
+  
   unsigned char input;
   char c;
-  
-  
   while(1){
-      /*
-    // Send -------------------------------------------------------------------
-    // What to send
+    //----- EXAMPLE READ AND WRITE TO SERIAL ------
+
+    /*
     cin >> input;
 
     // Output buffer
@@ -44,13 +42,7 @@ void serialcom()
     // Convert and send
     command[0] = static_cast<unsigned char>( input );
     write(port, buffer(command, 1));
-*/
-    // Receive response -------------------------------------------------------
-    
-    
-      input = 'B';
-    unsigned char command[1] ={0};
-    command[0] = static_cast<unsigned char>(input);
+    */
     
     read(port,buffer(&c,1));
     
@@ -75,11 +67,9 @@ void serialcom()
         unsigned char command[1] ={0};
         command[0] = static_cast<unsigned char>(input);
         write(port,buffer(command,1));
-
     }
     else{
     //cout << c << endl;
-        
     }
   }
 }
