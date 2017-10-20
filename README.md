@@ -2,8 +2,21 @@
 
 find.sh is a shell script I created to display all currently connected devices to the image tracking computer.
 
+### Dependencies 
 
-### Potential run-time errors
+You will need to have Boost installed on your linux system for the asio lib to be linked.
+
+```
+sudo apt-get install libboost-all-dev
+```
+
+Make sure you g++ with correct links to boost dir. 
+
+```
+g++ main.cpp -isystem /usr/include/boost -L/usr/include/ -lboost_system -std=gnu++11 -pthread -o test
+```
+
+#### Potential run-time errors
 ```
 terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> >'
   what():  open: No such file or directory
