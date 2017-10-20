@@ -5,23 +5,20 @@ find.sh is a shell script I created to display all currently connected devices t
 
 ### Potential run-time errors
 ```
-
 terminate called after throwing an instance of 'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::system::system_error> >'
   what():  open: No such file or directory
 ```
 
 This is caused when the device the program is trying to connect to is either not connected or the wrong port has been set with in the main.cpp code.
 
-Run
+Run this command:
 ```
-
 ./find.sh
 ```
 
 and you should find the arduino, you may need to set the correct write permissions, to do so write.
 
 ```
-
 sudo chmod a+rw /dev/ttyACM0 
 ```
 
