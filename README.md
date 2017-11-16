@@ -45,3 +45,6 @@ sudo chmod a+rw /dev/ttyACM0
 ```
 
 replacing ttyACM0 with the device location previously found using ./find.sh. Then you need to change the define line within main.cpp to reflect the correct device file. 
+
+### Logging Data
+A logging feature was added to allow for the data to be graphed and stored for later comparasion of control system values. To start logging the data, click on one of the opencv windows and press the "l" key and a message in the terminal should appear saying that the logging has started. To end the logging press the "s" key to save the logged data to the "log.txt" file. The data is collected at every new position value which is obtained, along with the setpoint. The data is then plotted using MATLAB function "visualise.m". 
