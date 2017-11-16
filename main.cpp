@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <fstream>
  #include <cstring>
-
+#include <string>
  #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -47,70 +47,181 @@ vector<int> vecstr_to_vecint(vector<string> vs)
     }  
     return ret;
 }
-
+//DATA LOGGING
+std::string logged_data ;
+bool logdata = false;
 
 //CROSS THREAD COM'S
 volatile int currentPos = 0;
-
+int currentSetpoint = 0;
+int currentP = 0;
+int currentI = 0;
+int currentD = 0;
+int currentCompVal = 10;
+bool useSerialCom = false;
 void serialcom() 
 {
-  io_service io;
-  serial_port port( io, PORT );
-  // Setup port - base settings
-  port.set_option( BAUD );
-  port.set_option( FLOW );
-  port.set_option( PARITY );
-  port.set_option( STOP );
-  
-  unsigned char input;
-  char c;
-  while(1){
-    //----- EXAMPLE READ AND WRITE TO SERIAL ------
+    if(useSerialCom){
+        io_service io;
+        serial_port port( io, PORT );
+        // Setup port - base settings
+        port.set_option( BAUD );
+        port.set_option( FLOW );
+        port.set_option( PARITY );
+        port.set_option( STOP );
+        
+        unsigned char input;
+        char c;
+        while(1){
+            //----- EXAMPLE READ AND WRITE TO SERIAL ------
 
-    /*
-    cin >> input;
+            /*
+            cin >> input;
 
-    // Output buffer
-    unsigned char command[1] = {0};
+            // Output buffer
+            unsigned char command[1] = {0};
 
-    // Convert and send
-    command[0] = static_cast<unsigned char>( input );
-    write(port, buffer(command, 1));
-    */
-    
-    read(port,buffer(&c,1));
-    //cout << c << endl;
-    
-    if(c == 'A'){ //When the arduino asks for y pos
-        
-        
-        char cx[3];
-        string stx = "";
-        stringstream cvstr;
-        cvstr << currentPos;
-        stx = cvstr.str().c_str();
-        strcpy(cx,stx.c_str());
-        
-        
+            // Convert and send
+            command[0] = static_cast<unsigned char>( input );
+            write(port, buffer(command, 1));
+            */
+            
+            read(port,buffer(&c,1));
+            //cout << c << endl;
+            
+            if(c == 'A'){ //When the arduino asks for y pos
+                
+                
+                char cx[3];
+                string stx = "";
+                stringstream cvstr;
+                cvstr << currentPos;
+                stx = cvstr.str().c_str();
+                strcpy(cx,stx.c_str());
+                
+                char cSP[3];
+                string stxSP = "";
+                stringstream cvstrSP;
+                cvstrSP << currentSetpoint;
+                stxSP = cvstrSP.str().c_str();
+                strcpy(cSP,stxSP.c_str());
 
-        //cout << strlen(cx) << endl;
-        
-        for(int i = 0; i < strlen(cx);i++){
-            input = cx[i];
-            unsigned char command[1] ={0};
-            command[0] = static_cast<unsigned char>(input);
-            write(port,buffer(command,1));
+                
+                        char cPVal[3];
+                string stPVal = "";
+                stringstream cvstrSPVal;
+                cvstrSPVal << currentP;
+                stPVal = cvstrSPVal.str().c_str();
+                strcpy(cPVal,stPVal.c_str());
+                
+                
+                    char cIVal[3];
+                string stIVal = "";
+                stringstream cvstrSIVal;
+                cvstrSIVal << currentI;
+                stIVal = cvstrSIVal.str().c_str();
+                strcpy(cIVal,stIVal.c_str());
+                
+                //DValue
+		char cDVal[3];
+                string stDVal = "";
+                stringstream cvstrSDVal;
+                cvstrSDVal << currentD;
+                stDVal = cvstrSDVal.str().c_str();
+                strcpy(cDVal,stDVal.c_str());
+		
+		 //CompValue
+		char cCompVal[3];
+                string stCompVal = "";
+                stringstream cvstrSCompVal;
+                cvstrSCompVal << currentCompVal;
+                stCompVal = cvstrSCompVal.str().c_str();
+                strcpy(cCompVal,stCompVal.c_str());
+		
+		             
+
+                //cout << strlen(cx) << endl;
+                //CURRENT POSITION
+                for(int i = 0; i < strlen(cx);i++){
+                    input = cx[i];
+                    unsigned char command[1] ={0};
+                    command[0] = static_cast<unsigned char>(input);
+                    write(port,buffer(command,1));
+                }
+                
+                unsigned char command[1] ={0};
+                input = ',';
+                command[0] = static_cast<unsigned char>(input);
+                write(port,buffer(command,1));
+                
+                //SETPOINT
+                for(int i = 0; i < strlen(cSP);i++){
+                    input = cSP[i];
+                    unsigned char command[1] ={0};
+                    command[0] = static_cast<unsigned char>(input);
+                    write(port,buffer(command,1));
+                }
+                
+                input = ',';
+                command[0] = static_cast<unsigned char>(input);
+                write(port,buffer(command,1));
+                
+                //PVALUE
+                for(int i = 0; i < strlen(cPVal);i++){
+                    input = cPVal[i];
+                    unsigned char command[1] ={0};
+                    command[0] = static_cast<unsigned char>(input);
+                    write(port,buffer(command,1));
+                }
+                
+                input = ',';
+                command[0] = static_cast<unsigned char>(input);
+                write(port,buffer(command,1));
+                
+                //IVALUE
+                for(int i = 0; i < strlen(cIVal);i++){
+                    input = cIVal[i];
+                    unsigned char command[1] ={0};
+                    command[0] = static_cast<unsigned char>(input);
+                    write(port,buffer(command,1));
+                }
+                
+                input = ',';
+                command[0] = static_cast<unsigned char>(input);
+                write(port,buffer(command,1));
+                
+                    //DVALUE
+                for(int i = 0; i < strlen(cDVal);i++){
+                    input = cDVal[i];
+                    unsigned char command[1] ={0};
+                    command[0] = static_cast<unsigned char>(input);
+                    write(port,buffer(command,1));
+                }
+
+	        input = ',';
+                command[0] = static_cast<unsigned char>(input);
+                write(port,buffer(command,1));
+                
+                    //CompVALUE
+                for(int i = 0; i < strlen(cCompVal);i++){
+                    input = cCompVal[i];
+                    unsigned char command[1] ={0};
+                    command[0] = static_cast<unsigned char>(input);
+                    write(port,buffer(command,1));
+                }
+
+
+		
+                // END OF TRANSMITION
+                input = '!';
+                command[0] = static_cast<unsigned char>(input);
+                write(port,buffer(command,1));
+            }
+            else{
+        // cout << c << endl;
+            }
         }
-        // END OF TRANSMITION
-        input = '!';
-        unsigned char command[1] ={0};
-        command[0] = static_cast<unsigned char>(input);
-        write(port,buffer(command,1));
     }
-    else{
-    //cout << c << endl;
-    }
-  }
 }
 
 void visualcontrol()
@@ -121,24 +232,22 @@ void visualcontrol()
     if ( !cap.isOpened() )  // if not success, exit program
     {
          cout << "Cannot open the web cam" << endl;
-    
-        
     }
 	
 
 	// setting up serial output	
 	//create default HSV Values
 	
-	int iLowH = 170;
+	int iLowH = 0;
 	int iHighH = 179;
 
-	int iLowS = 150; 
+	int iLowS = 0; 
 	int iHighS = 255;
 
-	int iLowV = 60;
+	int iLowV = 0;
 	int iHighV = 255;
 	
-	
+
 	//Ask if user wants to use last HSV Values
 	string useLastVals;
 	bool openFile;
@@ -147,41 +256,41 @@ void visualcontrol()
 	if(useLastVals == "y"){openFile = true;}
 	else{openFile = false;}
 	
-	std::string input = "";
-	string line;
-	ifstream myfile ("hsv.txt");
-	if (myfile.is_open())
-	{
-		while ( getline (myfile,line) )
-		{
-			cout << line << '\n';
-			input = line;
-		}
-		myfile.close();
-	}
+	if(openFile==true)
+        {
+            std::string input = "";
+            string line;
+            ifstream myfile ("hsv.txt");
+            if (myfile.is_open())
+            {
+                while ( getline (myfile,line) )
+                {
+                    cout << line << '\n';
+                    input = line;
+                }
+                myfile.close();
+                    
+                vector <string> tokens;
+            
+                std::istringstream ss(input);
+                std::string token;
 
-	else cout << "Unable to open file"; 
+                while(std::getline(ss, token, ',')) 
+                {
+                    tokens.push_back(token);
+                }
+                vector<int> input_int = vecstr_to_vecint(tokens);
+                iLowH = input_int[0];
+                iHighH = input_int[1];
 
+                iLowS = input_int[2]; 
+                iHighS = input_int[3];
 
-	vector <string> tokens;
-	
-	std::istringstream ss(input);
-	std::string token;
-
-	while(std::getline(ss, token, ',')) {
-		
-		tokens.push_back(token);
-	}
-	vector<int> input_int = vecstr_to_vecint(tokens);
-	iLowH = input_int[0];
-	iHighH = input_int[1];
-
-	iLowS = input_int[2]; 
-	iHighS = input_int[3];
-
-	iLowV = input_int[4];
-	iHighV = input_int[5];	
-
+                iLowV = input_int[4];
+                iHighV = input_int[5];
+            }
+            else cout << "Unable to open file, using defult"; 
+        }
 	
 	namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
   //Create trackbars in "Control" window
@@ -193,6 +302,13 @@ void visualcontrol()
 
   createTrackbar("LowV", "Control", &iLowV, 255);//Value (0 - 255)
  createTrackbar("HighV", "Control", &iHighV, 255);
+ 
+ namedWindow("SetPoint",CV_WINDOW_AUTOSIZE);
+ createTrackbar("Setpoint", "SetPoint", &currentSetpoint, 200);
+ createTrackbar("currentP", "SetPoint", &currentP, 200);
+ createTrackbar("currentI", "SetPoint", &currentI, 200);
+ createTrackbar("currentD", "SetPoint", &currentD, 200);
+ createTrackbar("currentCompVal","SetPoint",&currentCompVal, 200);
 
   int iLastX = -1; 
  int iLastY = -1;
@@ -203,6 +319,7 @@ void visualcontrol()
 
   //Create a black image with the size as the camera output
  Mat imgLines = Mat::zeros( imgTmp.size(), CV_8UC3 );;
+ Mat imgText = Mat::zeros( imgTmp.size(), CV_8UC3 );;
  
     int timer = 0;
 
@@ -265,38 +382,74 @@ void visualcontrol()
 
     iLastX = posX;
    iLastY = posY;
-  // circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
+    imgLines = Scalar(5, 10, 15);
+    circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
+    
+    putText(imgText, "Hello World", Point(50,50), 0, 2551, (0, 255, 0), 1, LINE_AA);
+    
+    if(logdata){
+        std::string currentdata = to_string(currentPos);
+        currentdata.append(" ");
+        currentdata.append(to_string(currentSetpoint));
+        currentdata.append("\n");
+        logged_data.append(currentdata);
+    }
   }
 
-   imshow("Thresholded Image", imgThresholded); //show the thresholded image
+    imshow("Thresholded Image", imgThresholded); //show the thresholded image
 
-   imgOriginal = imgOriginal + imgLines;
-  imshow("Original", imgOriginal); //show the original image
+    imgOriginal = imgOriginal + imgLines + imgText;
+    imshow("Original", imgOriginal); //show the original image
 
         if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
        {
             cout << "esc key is pressed by user" << endl;
 			break; 
        }
+       if(waitKey(30) == 108){
+           cout << "Data loging has started" << endl;
+           logdata = true;
+           
+    }
+        if (waitKey(30) == 115){
+            cout << "Data logging has been stopped and data will be saved to file" << endl;
+            ofstream myfile;
+    myfile.open ("log.txt",ios::out);
+    myfile << logged_data;
+    myfile.close();
+        }
+       
+       
+       
+       
     }
     
     
     
 }
 
+
 int main() 
 {
-  std::thread first (serialcom);     // spawn new thread that calls foo()
-  std::thread second (visualcontrol);  // spawn new thread that calls bar(0)
+    //Ask if user wants to use serial com
+    string useLastVals;
+    std::cout << "Do you want to use serial compunication ? (y / n): " ;
+    std::cin >> useLastVals;
+    if(useLastVals == "y"){useSerialCom = true;}
+    else{useSerialCom = false;}
+    
+    
+    std::thread first (serialcom);// spawn new thread that calls first()
+    std::thread second (visualcontrol);  // spawn new thread that calls second(0)
 
-  std::cout << "main, foo and bar now execute concurrently...\n";
+    std::cout << "main, serialcom and visualcontrol now execute concurrently...\n";
 
-  // synchronize threads:
-  first.join();                // pauses until first finishes
-  second.join();               // pauses until second finishes
+    // synchronize threads:
+    first.join();   // pauses until first finishes
+    second.join();  // pauses until second finishes
 
-  std::cout << "foo and bar completed.\n";
+    std::cout << "Completed.\n";
 
-  return 0;
+    return 0;
 }
 
