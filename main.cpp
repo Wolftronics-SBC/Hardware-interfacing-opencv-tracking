@@ -237,7 +237,7 @@ void visualcontrol()
     // setting up serial output
     //create default HSV Values
     int HSV_Values [3][6];
-    
+    /*
     int iLowH = 0;
     int iHighH = 179;
 
@@ -246,7 +246,7 @@ void visualcontrol()
 
     int iLowV = 0;
     int iHighV = 255;
-
+	*/
 
     //Ask if user wants to use last HSV Values
     string useLastVals;
@@ -258,36 +258,40 @@ void visualcontrol()
 
     if(openFile==true)
     {
-        std::string input = "";
+        std::string input[3];
         string line;
         ifstream myfile ("hsv.txt");
         if (myfile.is_open())
         {
+			int i = 0;
             while ( getline (myfile,line) )
             {
                 cout << line << '\n';
-                input = line;
+                input[i] = line;
+				i++;
             }
             myfile.close();
 
-            vector <string> tokens;
+			for(int j = 0; j<i; j++){
+				vector <string> tokens;
 
-            std::istringstream ss(input);
-            std::string token;
+				std::istringstream ss(input[j]);
+				std::string token;
 
-            while(std::getline(ss, token, ','))
-            {
-                tokens.push_back(token);
-            }
-            vector<int> input_int = vecstr_to_vecint(tokens);
-            iLowH = input_int[0];
-            iHighH = input_int[1];
+				while(std::getline(ss, token, ','))
+				{
+					tokens.push_back(token);
+				}
+				vector<int> input_int = vecstr_to_vecint(tokens);
+				HSV_Values [j][0] = input_int[0];
+				HSV_Values [j][1] = input_int[1];
 
-            iLowS = input_int[2];
-            iHighS = input_int[3];
+				HSV_Values [j][2] = input_int[2];
+				HSV_Values [j][3] = input_int[3];
 
-            iLowV = input_int[4];
-            iHighV = input_int[5];
+				HSV_Values [j][4] = input_int[4];
+				HSV_Values [j][5] = input_int[5];
+			}
         }
         else cout << "Unable to open file, using defult";
     }
