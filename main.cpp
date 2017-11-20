@@ -235,7 +235,8 @@ void visualcontrol()
     }
     // setting up serial output
     //create default HSV Values
-
+    int HSV_Values [3][6];
+    
     int iLowH = 0;
     int iHighH = 179;
 
