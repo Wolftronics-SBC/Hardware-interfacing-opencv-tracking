@@ -52,10 +52,7 @@ std::string logged_data ;
 bool logdata = false;
 
 //CROSS THREAD COM'S
-volatile int currentPos[3];
-for (int i = 0; i < 3 ; i ++;){
-    currentPos[i] = 0;
-}
+volatile int currentPos[3] ={0,0,0};
 int currentSetpoint = 0;
 int currentP = 0;
 int currentI = 0;
@@ -323,12 +320,17 @@ void visualcontrol()
         createTrackbar("LowV", windowName, &HSV_Values[i][4], 255);//Value (0 - 255)
         createTrackbar("HighV", windowName, &HSV_Values[i][5], 255);
     }
-    int dot_count = 3;
+    int dot_count = Value_Count ;
 
     // Used in the event that the last position is not obtained
-    int iLastX[dot_count] = -1;
-    int iLastY[dot_count] = -1;
-
+    int iLastX[dot_count];
+    for(int i = 0; i < Value_Count; i++){
+        iLastX[i] = -1;
+    }
+    int iLastY[dot_count];
+    for(int i = 0; i < Value_Count; i++){
+        iLastY[i] = -1;
+    }
     //Capture a temporary image from the camera
     Mat imgTmp;
     cap.read(imgTmp);
@@ -350,9 +352,10 @@ void visualcontrol()
 
         Mat imgHSV[dot_count];
         Mat imgThresholded[dot_count];
+        
         for(int x = 0; x < dot_count;x++){
             cvtColor(imgOriginal, imgHSV[x], COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
-            inRange(imgHSV[x], Scalar(HSV_Values[i][0], HSV_Values[i][2], HSV_Values[i][4]), Scalar(HSV_Values[i][1], HSV_Values[i][3], HSV_Values[i][5]), imgThresholded[x]); //Threshold the image
+            inRange(imgHSV[x], Scalar(HSV_Values[x][0], HSV_Values[x][2], HSV_Values[x][4]), Scalar(HSV_Values[x][1], HSV_Values[x][3], HSV_Values[x][5]), imgThresholded[x]); //Threshold the image
             //morphological opening (removes small objects from the foreground)
             erode(imgThresholded[x], imgThresholded[x], getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
             dilate( imgThresholded[x], imgThresholded[x], getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
@@ -384,13 +387,8 @@ void visualcontrol()
                 float input_end = 120;
                 currentPos[x] = (int)(output_start + ((output_end - output_start) / (input_end - input_start)) * (posY - input_start));
                 cout<< currentPos[x] << endl;
-                if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
-                {
-                    //Draw a red line from the previous point to the current point
-                    //line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0,0,255), 2);
-                }
-                iLastX = posX;
-                iLastY = posY;
+                iLastX[x] = posX;
+                iLastY[x] = posY;
                 imgLines = Scalar(5, 10, 15);
                 circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
                 if(logdata){
@@ -403,7 +401,11 @@ void visualcontrol()
                     logged_data.append(currentdata);
                 }
             }
-            imshow("Thresholded Image", imgThresholded[x]); //show the thresholded image
+            
+            std::ostringstream oss;
+            oss << "Threshold Image " << x ;
+            std::string windowName = oss.str();
+            imshow(windowName, imgThresholded[x]); //show the thresholded image
                     
         }	
         imshow("Original", imgOriginal); //show the original image
