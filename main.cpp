@@ -1,3 +1,4 @@
+//whoop whoop
 //Adding Multiple colors
 #include <iostream>       // std::cout
 #include <thread>         // std::thread
@@ -235,7 +236,8 @@ void visualcontrol()
     }
     // setting up serial output
     //create default HSV Values
-
+    int HSV_Values [3][6];
+    
     int iLowH = 0;
     int iHighH = 179;
 
