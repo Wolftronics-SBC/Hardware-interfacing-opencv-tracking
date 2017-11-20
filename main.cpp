@@ -295,7 +295,15 @@ void visualcontrol()
         }
         else cout << "Unable to open file, using defult";
     }
-
+	
+    namedWindow("SetPoint",CV_WINDOW_AUTOSIZE);
+    createTrackbar("Setpoint", "SetPoint", &currentSetpoint, 200);
+    createTrackbar("currentP", "SetPoint", &currentP, 200);
+    createTrackbar("currentI", "SetPoint", &currentI, 200);
+    createTrackbar("currentD", "SetPoint", &currentD, 200);
+    createTrackbar("currentCompVal","SetPoint",&currentCompVal, 200);
+	
+	
     namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
     //Create trackbars in "Control" window
     createTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
@@ -307,12 +315,7 @@ void visualcontrol()
     createTrackbar("LowV", "Control", &iLowV, 255);//Value (0 - 255)
     createTrackbar("HighV", "Control", &iHighV, 255);
 
-    namedWindow("SetPoint",CV_WINDOW_AUTOSIZE);
-    createTrackbar("Setpoint", "SetPoint", &currentSetpoint, 200);
-    createTrackbar("currentP", "SetPoint", &currentP, 200);
-    createTrackbar("currentI", "SetPoint", &currentI, 200);
-    createTrackbar("currentD", "SetPoint", &currentD, 200);
-    createTrackbar("currentCompVal","SetPoint",&currentCompVal, 200);
+
 
     int iLastX = -1;
     int iLastY = -1;
@@ -323,7 +326,6 @@ void visualcontrol()
 
     //Create a black image with the size as the camera output
     Mat imgLines = Mat::zeros( imgTmp.size(), CV_8UC3 );;
-    Mat imgText = Mat::zeros( imgTmp.size(), CV_8UC3 );;
 
     int timer = 0;
 
@@ -377,7 +379,6 @@ void visualcontrol()
             iLastY = posY;
             imgLines = Scalar(5, 10, 15);
             circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
-            putText(imgText, "Hello World", Point(50,50), 0, 2551, (0, 255, 0), 1, LINE_AA);
             if(logdata){
                 std::string currentdata = to_string(currentPos);
                 currentdata.append(" ");
@@ -387,7 +388,8 @@ void visualcontrol()
             }
         }
         imshow("Thresholded Image", imgThresholded); //show the thresholded image
-        imgOriginal = imgOriginal + imgLines + imgText;
+		
+		
         imshow("Original", imgOriginal); //show the original image
 
         if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
