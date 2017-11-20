@@ -1,3 +1,4 @@
+//whoop whoop
 //Adding Multiple colors
 #include <iostream>       // std::cout
 #include <thread>         // std::thread
