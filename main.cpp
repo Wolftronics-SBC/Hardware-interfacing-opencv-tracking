@@ -52,7 +52,10 @@ std::string logged_data ;
 bool logdata = false;
 
 //CROSS THREAD COM'S
-volatile int currentPos = 0;
+volatile int currentPos[3];
+for (int i = 0; i < 3 ; i ++;){
+    currentPos[i] = 0;
+}
 int currentSetpoint = 0;
 int currentP = 0;
 int currentI = 0;
@@ -97,7 +100,7 @@ void serialcom()
                 char cx[3];
                 string stx = "";
                 stringstream cvstr;
-                cvstr << currentPos;
+                cvstr << currentPos[1];
                 stx = cvstr.str().c_str();
                 strcpy(cx,stx.c_str());
 
@@ -237,6 +240,7 @@ void visualcontrol()
     // setting up serial output
     //create default HSV Values
     int HSV_Values [3][6];
+    int Value_Count = 0;
     /*
     int iLowH = 0;
     int iHighH = 179;
@@ -271,27 +275,27 @@ void visualcontrol()
 				i++;
             }
             myfile.close();
+            Value_Count = i;
+            for(int j = 0; j<Value_Count; j++){
+                    vector <string> tokens;
 
-			for(int j = 0; j<i; j++){
-				vector <string> tokens;
+                    std::istringstream ss(input[j]);
+                    std::string token;
 
-				std::istringstream ss(input[j]);
-				std::string token;
+                    while(std::getline(ss, token, ','))
+                    {
+                            tokens.push_back(token);
+                    }
+                    vector<int> input_int = vecstr_to_vecint(tokens);
+                    HSV_Values [j][0] = input_int[0];
+                    HSV_Values [j][1] = input_int[1];
 
-				while(std::getline(ss, token, ','))
-				{
-					tokens.push_back(token);
-				}
-				vector<int> input_int = vecstr_to_vecint(tokens);
-				HSV_Values [j][0] = input_int[0];
-				HSV_Values [j][1] = input_int[1];
+                    HSV_Values [j][2] = input_int[2];
+                    HSV_Values [j][3] = input_int[3];
 
-				HSV_Values [j][2] = input_int[2];
-				HSV_Values [j][3] = input_int[3];
-
-				HSV_Values [j][4] = input_int[4];
-				HSV_Values [j][5] = input_int[5];
-			}
+                    HSV_Values [j][4] = input_int[4];
+                    HSV_Values [j][5] = input_int[5];
+            }
         }
         else cout << "Unable to open file, using defult";
     }
@@ -302,32 +306,35 @@ void visualcontrol()
     createTrackbar("currentI", "SetPoint", &currentI, 200);
     createTrackbar("currentD", "SetPoint", &currentD, 200);
     createTrackbar("currentCompVal","SetPoint",&currentCompVal, 200);
-	
-	
-    namedWindow("Control", CV_WINDOW_AUTOSIZE); //create a window called "Control"
-    //Create trackbars in "Control" window
-    createTrackbar("LowH", "Control", &iLowH, 179); //Hue (0 - 179)
-    createTrackbar("HighH", "Control", &iHighH, 179);
 
-    createTrackbar("LowS", "Control", &iLowS, 255); //Saturation (0 - 255)
-    createTrackbar("HighS", "Control", &iHighS, 255);
+    
+    //Creating looped HSV Adjustment
+    for(int i = 0; i < Value_Count; i++){
+        std::ostringstream oss;
+        oss << "Control " << i ;
+        std::string windowName = oss.str();
+        namedWindow(windowName, CV_WINDOW_AUTOSIZE); //create a window called "Control"
+        //Create trackbars in "Control" window
+        createTrackbar("LowH", windowName, &HSV_Values[i][0], 179); //Hue (0 - 179)
+        createTrackbar("HighH", windowName, &HSV_Values[i][1], 179);
+        createTrackbar("LowS", windowName, &HSV_Values[i][2], 255); //Saturation (0 - 255)
+        createTrackbar("HighS", windowName, &HSV_Values[i][3], 255);
 
-    createTrackbar("LowV", "Control", &iLowV, 255);//Value (0 - 255)
-    createTrackbar("HighV", "Control", &iHighV, 255);
+        createTrackbar("LowV", windowName, &HSV_Values[i][4], 255);//Value (0 - 255)
+        createTrackbar("HighV", windowName, &HSV_Values[i][5], 255);
+    }
+    int dot_count = 3;
 
-
-
-    int iLastX = -1;
-    int iLastY = -1;
+    // Used in the event that the last position is not obtained
+    int iLastX[dot_count] = -1;
+    int iLastY[dot_count] = -1;
 
     //Capture a temporary image from the camera
     Mat imgTmp;
     cap.read(imgTmp);
 
     //Create a black image with the size as the camera output
-    Mat imgLines = Mat::zeros( imgTmp.size(), CV_8UC3 );;
-
-    int timer = 0;
+    Mat imgLines = Mat::zeros( imgTmp.size(), CV_8UC3 );; // used for the dots
 
     while (true)
     {
@@ -341,55 +348,64 @@ void visualcontrol()
              break;
         }
 
-        Mat imgHSV;
-        cvtColor(imgOriginal, imgHSV, COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
-        Mat imgThresholded;
-        inRange(imgHSV, Scalar(iLowH, iLowS, iLowV), Scalar(iHighH, iHighS, iHighV), imgThresholded); //Threshold the image
-        //morphological opening (removes small objects from the foreground)
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        Mat imgHSV[dot_count];
+        Mat imgThresholded[dot_count];
+        for(int x = 0; x < dot_count;x++){
+            cvtColor(imgOriginal, imgHSV[x], COLOR_BGR2HSV); //Convert the captured frame from BGR to HSV
+            inRange(imgHSV[x], Scalar(HSV_Values[i][0], HSV_Values[i][2], HSV_Values[i][4]), Scalar(HSV_Values[i][1], HSV_Values[i][3], HSV_Values[i][5]), imgThresholded[x]); //Threshold the image
+            //morphological opening (removes small objects from the foreground)
+            erode(imgThresholded[x], imgThresholded[x], getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+            dilate( imgThresholded[x], imgThresholded[x], getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
 
-        //morphological closing (removes small holes from the foreground)
-        dilate( imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
-        erode(imgThresholded, imgThresholded, getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+            //morphological closing (removes small holes from the foreground)
+            dilate( imgThresholded[x], imgThresholded[x], getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+            erode(imgThresholded[x], imgThresholded[x], getStructuringElement(MORPH_ELLIPSE, Size(5, 5)) );
+        
+        
+        
+            // Finding the positio of each dot
+            //Calculate the moments of the thresholded image
+            
+            Moments oMoments = moments(imgThresholded[x]);
+       
 
-        //Calculate the moments of the thresholded image
-        Moments oMoments = moments(imgThresholded);
-        double dM01 = oMoments.m01;
-        double dM10 = oMoments.m10;
-        double dArea = oMoments.m00;
-        // if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero
-        if (dArea > 10000)
-        {
-            //calculate the position of the marker
-            int posX = dM10 / dArea;
-            int posY = dM01 / dArea;
-            float output_start = 1;
-            float output_end = 100;
-            float input_start = 390;
-            float input_end = 120;
-            currentPos = (int)(output_start + ((output_end - output_start) / (input_end - input_start)) * (posY - input_start));
-            cout<< currentPos << endl;
-            if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
+            double dM01 = oMoments.m01;
+            double dM10 = oMoments.m10;
+            double dArea = oMoments.m00;
+            // if the area <= 10000, I consider that the there are no object in the image and it's because of the noise, the area is not zero
+            if (dArea > 10000)
             {
-                //Draw a red line from the previous point to the current point
-                //line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0,0,255), 2);
+                //calculate the position of the marker
+                int posX = dM10 / dArea;
+                int posY = dM01 / dArea;
+                float output_start = 1;
+                float output_end = 100;
+                float input_start = 390;
+                float input_end = 120;
+                currentPos[x] = (int)(output_start + ((output_end - output_start) / (input_end - input_start)) * (posY - input_start));
+                cout<< currentPos[x] << endl;
+                if (iLastX >= 0 && iLastY >= 0 && posX >= 0 && posY >= 0)
+                {
+                    //Draw a red line from the previous point to the current point
+                    //line(imgLines, Point(posX, posY), Point(iLastX, iLastY), Scalar(0,0,255), 2);
+                }
+                iLastX = posX;
+                iLastY = posY;
+                imgLines = Scalar(5, 10, 15);
+                circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
+                if(logdata){
+                    std::string currentdata = to_string(x);
+                    currentdata.append(" ");
+                    currentdata.append(to_string(currentPos[x]));
+                    currentdata.append(" ");
+                    currentdata.append(to_string(currentSetpoint));
+                    currentdata.append("\n");
+                    logged_data.append(currentdata);
+                }
             }
-            iLastX = posX;
-            iLastY = posY;
-            imgLines = Scalar(5, 10, 15);
-            circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
-            if(logdata){
-                std::string currentdata = to_string(currentPos);
-                currentdata.append(" ");
-                currentdata.append(to_string(currentSetpoint));
-                currentdata.append("\n");
-                logged_data.append(currentdata);
-            }
-        }
-        imshow("Thresholded Image", imgThresholded); //show the thresholded image
-		
-		
+            imshow("Thresholded Image", imgThresholded[x]); //show the thresholded image
+                    
+        }	
         imshow("Original", imgOriginal); //show the original image
 
         if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
