@@ -69,7 +69,7 @@ volatile bool def4 = false;
 
 // steppers
 #define Resolution 10 //22 for fully open to fully closed 1-100
-int motorSpeed = 7;
+int motorSpeed = 6;
 int stepsPerRevolution =  64 * 32;
 X113647Stepper flowStep1(stepsPerRevolution, step1A1, step1B2, step1C3, step1D4);
 X113647Stepper flowStep2(stepsPerRevolution, step2A1, step2B2, step2C3, step2D4);
@@ -323,8 +323,8 @@ void control(){
     def1 = true;
    }
    
-   //flowStep1Target = (int)(output);//abs(current - target));
-   flowStep1Target = (int)(Kp*(double)(abs(current - target)));
+   flowStep1Target = (int)(output);//abs(current - target));
+   //flowStep1Target = (int)(Kp*(double)(abs(current - target)));
    //Serial2.println((int)(Kp*(double)(abs(current - target))));
 
 }
