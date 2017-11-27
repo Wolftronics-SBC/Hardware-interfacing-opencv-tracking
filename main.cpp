@@ -95,7 +95,7 @@ void serialcom()
                 char cx[3];
                 string stx = "";
                 stringstream cvstr;
-                cvstr << currentPos[1];
+                cvstr << currentPos[0];
                 stx = cvstr.str().c_str();
                 strcpy(cx,stx.c_str());
 
@@ -384,11 +384,20 @@ void visualcontrol()
                 float input_start = 390;
                 float input_end = 120;
                 currentPos[x] = (int)(output_start + ((output_end - output_start) / (input_end - input_start)) * (posY - input_start));
-                cout<< currentPos[x] << endl;
+                cout<< currentPos[0] << endl;
                 iLastX[x] = posX;
                 iLastY[x] = posY;
                 imgLines = Scalar(5, 10, 15);
-                circle(imgLines, Point(posX,posY),10, Scalar(255,255,255),CV_FILLED, 8,0);
+                if(x == 0){
+                circle(imgLines, Point(posX,posY),10, Scalar(0,255,255),CV_FILLED, 8,0);
+                }
+                else if (x == 1){
+                                    circle(imgLines, Point(posX,posY),10, Scalar(255,0,255),CV_FILLED, 8,0);
+                }
+                else{
+                                    circle(imgLines, Point(posX,posY),10, Scalar(255,255,0),CV_FILLED, 8,0);
+
+                }
                 if(logdata){
                     std::string currentdata = to_string(x);
                     currentdata.append(" ");
@@ -404,6 +413,7 @@ void visualcontrol()
             oss << "Threshold Image " << x ;
             std::string windowName = oss.str();
             imshow(windowName, imgThresholded[x]); //show the thresholded image
+            imgOriginal = imgOriginal + imgLines;
                     
         }	
         imshow("Original", imgOriginal); //show the original image
