@@ -215,6 +215,35 @@ void loop() {
       }
       butt1LastState = butt1State;
     }
+    if(digitalRead(butt2) == 0){
+        digitalWrite(sol1def, 1);
+        digitalWrite(sol1inf, 1);
+        delay(50);
+        digitalWrite(sol1def, 0);
+        digitalWrite(sol1inf, 0);
+        delay(50);
+
+        digitalWrite(sol2def, 1);
+        digitalWrite(sol2inf, 1);
+        delay(50);
+        digitalWrite(sol2def, 0);
+        digitalWrite(sol2inf, 0);
+        delay(50);
+
+        digitalWrite(sol3def, 1);
+        digitalWrite(sol3inf, 1);
+        delay(50);
+        digitalWrite(sol3def, 0);
+        digitalWrite(sol3inf, 0);
+        delay(50);
+
+        digitalWrite(sol4def, 1);
+        digitalWrite(sol4inf, 1);
+        delay(50);
+        digitalWrite(sol4def, 0);
+        digitalWrite(sol4inf, 0);
+        delay(50);
+    }
     
   }
 
