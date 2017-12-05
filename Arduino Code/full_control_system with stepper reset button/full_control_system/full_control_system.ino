@@ -69,6 +69,7 @@ volatile bool def4 = false;
 
 // steppers
 #define Resolution 10 //22 for fully open to fully closed 1-100
+int defultPos = 0;
 int motorSpeed = 6;
 int stepsPerRevolution =  64 * 32;
 X113647Stepper flowStep1(stepsPerRevolution, step1A1, step1B2, step1C3, step1D4);
@@ -198,20 +199,20 @@ void loop() {
     if(butt1State != butt1LastState){
       if(butt1State && !butt1LastState){
         flowStep1.setSpeed(motorSpeed);
-        flowStep1Curent = 0;
-        flowStep1Target = 0;
+        flowStep1Curent = defultPos;
+        flowStep1Target = defultPos;
         
         flowStep2.setSpeed(motorSpeed);
-        flowStep2Curent = 0;
-        flowStep2Target = 0;
+        flowStep2Curent = defultPos;
+        flowStep2Target = defultPos;
         
         flowStep3.setSpeed(motorSpeed);
-        flowStep3Curent = 0;
-        flowStep3Target = 0;
+        flowStep3Curent = defultPos;
+        flowStep3Target = defultPos;
         
         flowStep4.setSpeed(motorSpeed);
-        flowStep4Curent = 0;
-        flowStep4Target = 0;
+        flowStep4Curent = defultPos;
+        flowStep4Target = defultPos;
       }
       butt1LastState = butt1State;
     }
