@@ -10,35 +10,35 @@ Timer timerControl;
 
 //pins
 // solinoids
-#define sol4inf 2
-#define sol4def 3
-#define sol3inf 4
-#define sol3def 5
-#define sol2inf 6
-#define sol2def 7
-#define sol1inf 8
-#define sol1def 9
+#define sol1inf 2
+#define sol1def 3
+#define sol2inf 4
+#define sol2def 5
+#define sol3inf 6
+#define sol3def 7
+#define sol4inf 8
+#define sol4def 9
 // stepper flow valves
 #define step1A1 10
 #define step1B2 11
 #define step1C3 12
 #define step1D4 13
-#define step2A1 22
-#define step2B2 23
-#define step2C3 24
-#define step2D4 25
-#define step3A1 26
-#define step3B2 27
-#define step3C3 28
-#define step3D4 29
-#define step4A1 30
-#define step4B2 31
-#define step4C3 32
-#define step4D4 33
+#define step2A1 14
+#define step2B2 15
+#define step2C3 16
+#define step2D4 17
+#define step3A1 18
+#define step3B2 19
+#define step3C3 20
+#define step3D4 21
+#define step4A1 22
+#define step4B2 23
+#define step4C3 24
+#define step4D4 25
 
 //buttons
-#define butt1 34
-#define butt2 35
+#define butt1 26
+#define butt2 27
 //button variables
 bool butt1State = false;
 bool butt1LastState = false;
@@ -69,7 +69,6 @@ volatile bool def4 = false;
 
 // steppers
 #define Resolution 10 //22 for fully open to fully closed 1-100
-int defultPos = 0;
 int motorSpeed = 6;
 int stepsPerRevolution =  64 * 32;
 X113647Stepper flowStep1(stepsPerRevolution, step1A1, step1B2, step1C3, step1D4);
@@ -199,51 +198,22 @@ void loop() {
     if(butt1State != butt1LastState){
       if(butt1State && !butt1LastState){
         flowStep1.setSpeed(motorSpeed);
-        flowStep1Curent = defultPos;
-        flowStep1Target = defultPos;
+        flowStep1Curent = 0;
+        flowStep1Target = 0;
         
         flowStep2.setSpeed(motorSpeed);
-        flowStep2Curent = defultPos;
-        flowStep2Target = defultPos;
+        flowStep2Curent = 0;
+        flowStep2Target = 0;
         
         flowStep3.setSpeed(motorSpeed);
-        flowStep3Curent = defultPos;
-        flowStep3Target = defultPos;
+        flowStep3Curent = 0;
+        flowStep3Target = 0;
         
         flowStep4.setSpeed(motorSpeed);
-        flowStep4Curent = defultPos;
-        flowStep4Target = defultPos;
+        flowStep4Curent = 0;
+        flowStep4Target = 0;
       }
       butt1LastState = butt1State;
-    }
-    if(digitalRead(butt2) == 0){
-        digitalWrite(sol1def, 1);
-        digitalWrite(sol1inf, 1);
-        delay(50);
-        digitalWrite(sol1def, 0);
-        digitalWrite(sol1inf, 0);
-        delay(50);
-
-        digitalWrite(sol2def, 1);
-        digitalWrite(sol2inf, 1);
-        delay(50);
-        digitalWrite(sol2def, 0);
-        digitalWrite(sol2inf, 0);
-        delay(50);
-
-        digitalWrite(sol3def, 1);
-        digitalWrite(sol3inf, 1);
-        delay(50);
-        digitalWrite(sol3def, 0);
-        digitalWrite(sol3inf, 0);
-        delay(50);
-
-        digitalWrite(sol4def, 1);
-        digitalWrite(sol4inf, 1);
-        delay(50);
-        digitalWrite(sol4def, 0);
-        digitalWrite(sol4inf, 0);
-        delay(50);
     }
     
   }
