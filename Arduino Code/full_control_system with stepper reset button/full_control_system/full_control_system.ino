@@ -352,8 +352,22 @@ void control(){
     inf1 = false;
     def1 = true;
    }
+
+   if(current <= target+range && current >= target-range){
+    inf2 = false;
+    def2 = false;
+   }
+   else if(current <= target-range){
+    inf2 = false;
+    def2 = true;
+   }
+   else if(current >= target+range){
+    inf2 = true;
+    def2 = false;
+   }
    
    flowStep1Target = (int)(output);//abs(current - target));
+   flowStep2Target = (int)(output);
    //flowStep1Target = (int)(Kp*(double)(abs(current - target)));
    //Serial2.println((int)(Kp*(double)(abs(current - target))));
 
