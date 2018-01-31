@@ -43,6 +43,13 @@ Timer timerControl;
 bool butt1State = false;
 bool butt1LastState = false;
 
+//sensor
+#define sensor1Pin A1
+#define sensor2Pin A2
+
+int sensor1Value = 0;
+int sensor2Value = 0;
+
 //control variables
 volatile double target = 0;
 volatile double current = 0;
@@ -114,7 +121,6 @@ void setup() {
   //setup serial
   Serial.begin(9600);
   Serial1.begin(9600);
-  Serial2.begin(9600);
 
   //pid
   PID1.SetMode(AUTOMATIC);
@@ -132,12 +138,23 @@ void loop() {
   timerDrive.update();
   timerControl.update();
 
+
+
     if (stringComplete) {
       inputString.remove(inputString.indexOf('!'));
       
       current = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
+      sensor1Value = analogRead(sensor1Pin);
+      sensor2Value = analogRead(sensor2Pin);
+      //Serial1.print(sensor1Value);
+      //Serial1.print(",");
+      //Serial1.print(sensor2Value);
+      //Serial1.print(",");
+      //Serial1.print(current);
+      //Serial1.println("!");
+  
       target = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
@@ -158,20 +175,20 @@ void loop() {
       reverseConst1 = (double)tempReverseConst1/10;
       
       //Serial1.print("current ");
-      Serial1.println(current);
+      //Serial1.println(current);
       //Serial1.print("target ");
-      Serial1.println(target);
+      //Serial1.println(target);
       //Serial1.print("tempKp ");
-      Serial1.println(tempKp);
+      //Serial1.println(tempKp);
       //Serial1.print("tempKi ");
-      Serial1.println(tempKi);
+      //Serial1.println(tempKi);
       //Serial1.print("tempKd ");
-      Serial1.println(tempKd);
+      //Serial1.println(tempKd);
       //Serial1.print("output ");
-      Serial1.println(output);
+      //Serial1.println(output);
       //Serial1.print("reverseConst1 ");
-      Serial1.println(reverseConst1);
-      Serial1.println(9999999);
+      //Serial1.println(reverseConst1);
+      //Serial1.println(9999999);
       
       // clear the string:
       inputString = "";
