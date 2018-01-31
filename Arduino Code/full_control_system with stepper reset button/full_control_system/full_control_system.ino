@@ -69,7 +69,7 @@ volatile bool def4 = false;
 
 // steppers
 #define Resolution 10 //22 for fully open to fully closed 1-100
-int defultPos = 0;
+int defultPos = -180; // harry's -180
 int motorSpeed = 6;
 int stepsPerRevolution =  64 * 32;
 X113647Stepper flowStep1(stepsPerRevolution, step1A1, step1B2, step1C3, step1D4);
