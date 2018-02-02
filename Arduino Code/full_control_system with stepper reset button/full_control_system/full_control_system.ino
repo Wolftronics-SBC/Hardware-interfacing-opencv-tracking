@@ -43,12 +43,11 @@ Timer timerControl;
 bool butt1State = false;
 bool butt1LastState = false;
 
-//sensor
-#define sensor1Pin A1
-#define sensor2Pin A2
-
-int sensor1Value = 0;
-int sensor2Value = 0;
+//sensors
+#define sens1 A1
+#define sens2 A2
+int sensValue1 = 0;
+int sensValue2 = 0;
 
 //control variables
 volatile double target = 0;
@@ -121,6 +120,7 @@ void setup() {
   //setup serial
   Serial.begin(9600);
   Serial1.begin(9600);
+  Serial2.begin(9600);
 
   //pid
   PID1.SetMode(AUTOMATIC);
@@ -138,23 +138,12 @@ void loop() {
   timerDrive.update();
   timerControl.update();
 
-
-
     if (stringComplete) {
       inputString.remove(inputString.indexOf('!'));
       
       current = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
-      sensor1Value = analogRead(sensor1Pin);
-      sensor2Value = analogRead(sensor2Pin);
-      //Serial1.print(sensor1Value);
-      //Serial1.print(",");
-      //Serial1.print(sensor2Value);
-      //Serial1.print(",");
-      //Serial1.print(current);
-      //Serial1.println("!");
-  
       target = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
@@ -189,7 +178,14 @@ void loop() {
       //Serial1.print("reverseConst1 ");
       //Serial1.println(reverseConst1);
       //Serial1.println(9999999);
-      
+      Serial1.print(sensValue1);
+      Serial1.print(",");
+      Serial1.print(sensValue2);
+      Serial1.print(",");
+      Serial1.print(current);
+      Serial1.println("! ");
+
+
       // clear the string:
       inputString = "";
       stringComplete = false;
@@ -355,6 +351,10 @@ void drive(){
 //PID control system
 void control(){
   //Serial.println("control");
+
+  sensValue1 = analogRead(sens1);
+  sensValue2 = analogRead(sens2);
+  
   
    int range = 1;
    if(current <= target+range && current >= target-range){
