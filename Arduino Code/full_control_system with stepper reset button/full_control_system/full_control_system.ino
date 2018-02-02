@@ -178,13 +178,7 @@ void loop() {
       //Serial1.print("reverseConst1 ");
       //Serial1.println(reverseConst1);
       //Serial1.println(9999999);
-      Serial1.print(sensValue1);
-      Serial1.print(",");
-      Serial1.print(sensValue2);
-      Serial1.print(",");
-      Serial1.print(current);
-      Serial1.println("! ");
-
+     
 
       // clear the string:
       inputString = "";
@@ -265,6 +259,13 @@ void loop() {
 void serial(){
   
   Serial.println("A");
+   Serial1.print(sensValue1);
+    Serial1.print(",");
+    Serial1.print(sensValue2);
+    Serial1.print(",");
+    Serial1.print(current);
+    Serial1.println("! ");
+
   
 //  if (Serial1.available()) {
 //    current = Serial1.parseInt();
@@ -283,8 +284,9 @@ void serial(){
  response.  Multiple bytes of data may be available.
  */
 void serialEvent() {
+  
   while (Serial.available()) {
-
+  
     // get the new byte:
     char inChar = (char)Serial.read();
     // add it to the inputString:
