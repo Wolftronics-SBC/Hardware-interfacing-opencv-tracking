@@ -39,6 +39,14 @@ Timer timerControl;
 //buttons
 #define butt1 34
 #define butt2 35
+
+#define sensor1Pin A1
+#define sensor2Pin A2
+
+int sensor1Value = 0;
+int sensor2Value = 0;
+
+
 //button variables
 bool butt1State = false;
 bool butt1LastState = false;
@@ -100,6 +108,7 @@ void setup() {
   pinMode (butt1,INPUT_PULLUP);
   pinMode (butt2,INPUT_PULLUP);
 
+  
   //set stepper speed
   flowStep1.setSpeed(motorSpeed);
   flowStep2.setSpeed(motorSpeed);
@@ -158,20 +167,20 @@ void loop() {
       reverseConst1 = (double)tempReverseConst1/10;
       
       //Serial1.print("current ");
-      Serial1.println(current);
+      //Serial1.println(current);
       //Serial1.print("target ");
-      Serial1.println(target);
+      //Serial1.println(target);
       //Serial1.print("tempKp ");
-      Serial1.println(tempKp);
+     // Serial1.println(tempKp);
       //Serial1.print("tempKi ");
-      Serial1.println(tempKi);
+      //Serial1.println(tempKi);
       //Serial1.print("tempKd ");
-      Serial1.println(tempKd);
+      //Serial1.println(tempKd);
       //Serial1.print("output ");
-      Serial1.println(output);
+      //Serial1.println(output);
       //Serial1.print("reverseConst1 ");
-      Serial1.println(reverseConst1);
-      Serial1.println(9999999);
+     // Serial1.println(reverseConst1);
+      //Serial1.println(9999999);
       
       // clear the string:
       inputString = "";
@@ -183,6 +192,8 @@ void loop() {
 
     //get steppers to inital positions
     butt1State = digitalRead(butt1);
+
+    
     if(!butt1State){
       flowStep1.setSpeed(motorSpeed+2);
       flowStep1.step(-Resolution);
@@ -245,7 +256,13 @@ void loop() {
         digitalWrite(sol4inf, 0);
         delay(50);
     }
-    
+      sensor1Value = analogRead(sensor1Pin);
+  sensor2Value = analogRead(sensor2Pin);
+  Serial1.println(sensor1Value);
+    Serial1.println(sensor2Value);
+  Serial1.println(current);
+  Serial1.println(999);
+
   }
 
 //get serial data for target and current position
