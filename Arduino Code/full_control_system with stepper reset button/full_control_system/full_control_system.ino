@@ -2,7 +2,6 @@
 #include <PID_v1.h>
 #include <Event.h>
 #include <Timer.h>
-#include <Wire.h>
 
 //timers
 Timer timerSerial;
@@ -44,12 +43,6 @@ Timer timerControl;
 bool butt1State = false;
 bool butt1LastState = false;
 
-//sensors
-#define sens1 A1
-#define sens2 A2
-int sensValue1 = 0;
-int sensValue2 = 0;
-
 //control variables
 volatile double target = 0;
 volatile double current = 0;
@@ -63,8 +56,6 @@ double reverseConst1 = 1;
 //serial variables
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
-//I2C variables
-String i2cdata = "";
 
 //drive variables
 volatile bool inf1 = false;
@@ -95,9 +86,6 @@ int flowStep4Curent = 0;
 int flowStep4Target = 0;
 
 void setup() {
-  //I2C 
-  Wire.begin();
-  
   // put your setup code here, to run once:
   //setup pins
   pinMode(LED_BUILTIN, OUTPUT);
@@ -170,22 +158,21 @@ void loop() {
       reverseConst1 = (double)tempReverseConst1/10;
       
       //Serial1.print("current ");
-      //Serial1.println(current);
+      Serial1.println(current);
       //Serial1.print("target ");
-      //Serial1.println(target);
+      Serial1.println(target);
       //Serial1.print("tempKp ");
-      //Serial1.println(tempKp);
+      Serial1.println(tempKp);
       //Serial1.print("tempKi ");
-      //Serial1.println(tempKi);
+      Serial1.println(tempKi);
       //Serial1.print("tempKd ");
-      //Serial1.println(tempKd);
+      Serial1.println(tempKd);
       //Serial1.print("output ");
-      //Serial1.println(output);
+      Serial1.println(output);
       //Serial1.print("reverseConst1 ");
-      //Serial1.println(reverseConst1);
-      //Serial1.println(9999999);
-     
-
+      Serial1.println(reverseConst1);
+      Serial1.println(9999999);
+      
       // clear the string:
       inputString = "";
       stringComplete = false;
@@ -264,13 +251,7 @@ void loop() {
 //get serial data for target and current position
 void serial(){
   
-  Serial.println("A"); // CALL TO COMPUTER TO GIVE ME DATA
-  i2cdata = "current";
-  Wire.beginTransmission(9);
-  Wire.write(i2cdata.c_str());
-  Wire.endTransmission();
-  
-   
+  Serial.println("A");
   
 //  if (Serial1.available()) {
 //    current = Serial1.parseInt();
@@ -289,9 +270,8 @@ void serial(){
  response.  Multiple bytes of data may be available.
  */
 void serialEvent() {
-  
   while (Serial.available()) {
-  
+
     // get the new byte:
     char inChar = (char)Serial.read();
     // add it to the inputString:
@@ -358,10 +338,6 @@ void drive(){
 //PID control system
 void control(){
   //Serial.println("control");
-
-  sensValue1 = analogRead(sens1);
-  sensValue2 = analogRead(sens2);
-  
   
    int range = 1;
    if(current <= target+range && current >= target-range){

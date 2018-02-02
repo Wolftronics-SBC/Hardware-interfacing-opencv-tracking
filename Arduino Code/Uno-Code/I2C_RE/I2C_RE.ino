@@ -4,6 +4,7 @@ void setup() {
   // put your setup code here, to run once:
   Wire.begin(9);
   Wire.onReceive(receiveEvent);
+  Serial.begin(9600);
 }
 
 void loop() {
