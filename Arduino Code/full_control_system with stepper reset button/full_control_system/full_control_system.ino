@@ -259,9 +259,14 @@ void loop() {
       sensor1Value = analogRead(sensor1Pin);
   sensor2Value = analogRead(sensor2Pin);
   Serial1.println(sensor1Value);
+    Serial1.println(',');
+
     Serial1.println(sensor2Value);
+        Serial1.println(',');
+
   Serial1.println(current);
-  Serial1.println(999);
+  
+  Serial1.println('!');
 
   }
 
