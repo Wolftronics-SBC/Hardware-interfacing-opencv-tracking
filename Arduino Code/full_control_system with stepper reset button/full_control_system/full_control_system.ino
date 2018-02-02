@@ -2,6 +2,7 @@
 #include <PID_v1.h>
 #include <Event.h>
 #include <Timer.h>
+#include <Wire.h>
 
 //timers
 Timer timerSerial;
@@ -62,6 +63,8 @@ double reverseConst1 = 1;
 //serial variables
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
+//I2C variables
+String i2cdata = "";
 
 //drive variables
 volatile bool inf1 = false;
@@ -92,6 +95,9 @@ int flowStep4Curent = 0;
 int flowStep4Target = 0;
 
 void setup() {
+  //I2C 
+  Wire.begin();
+  
   // put your setup code here, to run once:
   //setup pins
   pinMode(LED_BUILTIN, OUTPUT);
@@ -258,14 +264,13 @@ void loop() {
 //get serial data for target and current position
 void serial(){
   
-  Serial.println("A");
-   Serial1.print(sensValue1);
-    Serial1.print(",");
-    Serial1.print(sensValue2);
-    Serial1.print(",");
-    Serial1.print(current);
-    Serial1.println("! ");
-
+  Serial.println("A"); // CALL TO COMPUTER TO GIVE ME DATA
+  i2cdata = "current";
+  Wire.beginTransmission(9);
+  Wire.write(i2cdata.c_str());
+  Wire.endTransmission();
+  
+   
   
 //  if (Serial1.available()) {
 //    current = Serial1.parseInt();
