@@ -1,6 +1,4 @@
-#include <RunningAverage.h>
 
-RunningAverage myRA(5);
 
 #define dataIN 2
 
@@ -23,7 +21,6 @@ void setup()
   Serial.begin(9600);
   currentstate = digitalRead(dataIN);
   prevstate = currentstate;
-  myRA.clear(); // explicitly start clean
 }
 
 void loop()
@@ -38,13 +35,7 @@ void loop()
          if(duration <= duratLim){}
          else{        
            rpm = (60000000/duration)/numSegs; // rpm = (1/ time millis)*1000*1000*60;
-
-           if (rmp > 100){
-            
-           myRA.addValue(rpm);
-           }
-           
-           Serial.println(myRA.getAverage(), 3);
+           Serial.println(rpm);
            //Serial.print(", ");
            //Serial.println(micros());
          }
