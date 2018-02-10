@@ -31,9 +31,9 @@ figure( 'Name', 'untitled fit 1' );
 h = plot( fitresult, [xData, yData], zData );
 legend( h, 'untitled fit 1', 'muy vs. mux1, mux2', 'Location', 'NorthEast' );
 % Label axes
-xlabel mux1
-ylabel mux2
-zlabel muy
+xlabel 'Sensor 1'
+ylabel 'Sensor 2'
+zlabel 'Y Pos'
 grid on
 view( 290.9, 21.2 );
 
