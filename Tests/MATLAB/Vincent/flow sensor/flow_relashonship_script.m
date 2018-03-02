@@ -1,9 +1,12 @@
+
 figure;
-hold on
-plot (medfilt1(lpm18psi30))
-plot (medfilt1(lpm20psi30))
-plot (medfilt1(lpm22psi30))
-plot (medfilt1(lpm25psi30))
-plot (medfilt1(lpm27psi40))
-plot (medfilt1(lpm30psi40))
-plot (medfilt1(lpm34psi50))
+
+maxsize = max([length(lpm18psi30),length(lpm20psi30),length(lpm22psi30),length(lpm25psi30),length(lpm27psi40),length(lpm30psi40),length(lpm34psi50)]);
+
+relashonAnalyser( lpm18psi30 , maxsize );
+relashonAnalyser( lpm20psi30 , maxsize );
+relashonAnalyser( lpm22psi30 , maxsize );
+relashonAnalyser( lpm25psi30 , maxsize );
+relashonAnalyser( lpm27psi40 , maxsize );
+relashonAnalyser( lpm30psi40 , maxsize );
+relashonAnalyser( lpm34psi50 , maxsize );
