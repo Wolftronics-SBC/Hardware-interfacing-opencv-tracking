@@ -26,7 +26,7 @@ using namespace cv;
 
 //SERIAL PORT SETTINGS
 // Base serial settings
-serial_port_base::baud_rate BAUD(9600);
+serial_port_base::baud_rate BAUD(38400);
 serial_port_base::flow_control FLOW( serial_port_base::flow_control::none );
 serial_port_base::parity PARITY( serial_port_base::parity::none );
 serial_port_base::stop_bits STOP( serial_port_base::stop_bits::one );
@@ -50,13 +50,25 @@ std::string logged_data ;
 bool logdata = false;
 
 //CROSS THREAD COM'S
-volatile int currentPos[3] ={0,0,0};
+volatile int currentPosY[3] ={0,0,0};
+volatile int currentPosX[3] ={0,0,0};
 int currentSetpoint = 0;
 int currentP = 0;
 int currentI = 0;
 int currentD = 0;
 int currentCompVal = 10;
 bool useSerialCom = false;
+
+void itoc(int input,char* output){
+    string stx = "";
+    stringstream cvstr;
+    cvstr << input;
+    stx = cvstr.str().c_str();
+    strcpy(output,stx.c_str());
+}
+
+
+
 
 //Serial Communication Thread
 void serialcom()
@@ -72,9 +84,9 @@ void serialcom()
 
         unsigned char input;
         char c;
+        
         while(1){
             //----- EXAMPLE READ AND WRITE TO SERIAL ------
-
             /*
             cin >> input;
 
@@ -85,144 +97,123 @@ void serialcom()
             command[0] = static_cast<unsigned char>( input );
             write(port, buffer(command, 1));
             */
-
             read(port,buffer(&c,1)); // Read current input buffer in to character c
-
-            //cout << c << endl;//DEBUGGING - used to display current serial buffer
-
             if(c == 'A'){ //When the arduino asks for data
 		// YPOS
+                std::vector<char> transmission;
+                std::vector<char> trans1;
+            // fix the number of elements in the char array
                 char cx[3];
-                string stx = "";
-                stringstream cvstr;
-                cvstr << currentPos[0];
-                stx = cvstr.str().c_str();
-                strcpy(cx,stx.c_str());
+                itoc(currentPosX[0],cx);
+                if (cx[0] != NULL) transmission.push_back(cx[0]);
+                if (cx[1] != NULL) transmission.push_back(cx[1]);
+                if (cx[2] != NULL) transmission.push_back(cx[2]);
+                transmission.push_back(',');
+                
+                char cx1[3];
+                itoc(currentPosX[1],cx1);
+                if (cx1[0] != NULL) transmission.push_back(cx1[0]);
+                if (cx1[1] != NULL) transmission.push_back(cx1[1]);
+                if (cx1[2] != NULL) transmission.push_back(cx1[2]);
+                transmission.push_back(',');
+                
+                char cx2[3];
+                itoc(currentPosX[2],cx2);
+                if (cx2[0] != NULL) transmission.push_back(cx2[0]);
+                if (cx2[1] != NULL) transmission.push_back(cx2[1]);
+                if (cx2[2] != NULL) transmission.push_back(cx2[2]);
+                transmission.push_back(',');
+                
+                char cy[3];
+                itoc(currentPosY[0],cy);
+                if (cy[0] != NULL) transmission.push_back(cy[0]);
+                if (cy[1] != NULL) transmission.push_back(cy[1]);
+                if (cy[2] != NULL) transmission.push_back(cy[2]);
+                transmission.push_back(',');
+                
+                char cy1[3];
+                itoc(currentPosY[1],cy1);
+                if (cy1[0] != NULL) transmission.push_back(cy1[0]);
+                if (cy1[1] != NULL) transmission.push_back(cy1[1]);
+                if (cy1[2] != NULL) transmission.push_back(cy1[2]);
+                transmission.push_back(',');
+                
+                char cy2[3];
+                itoc(currentPosY[2],cy2);
+                if (cy2[0] != NULL) transmission.push_back(cy2[0]);
+                if (cy2[1] != NULL) transmission.push_back(cy2[1]);
+                if (cy2[2] != NULL) transmission.push_back(cy2[2]);
+                transmission.push_back(',');
 
-		// SetPoint Value
+                // SetPoint Value
                 char cSP[3];
-                string stxSP = "";
-                stringstream cvstrSP;
-                cvstrSP << currentSetpoint;
-                stxSP = cvstrSP.str().c_str();
-                strcpy(cSP,stxSP.c_str());
+                itoc(currentSetpoint,cSP);
+                transmission.push_back(cSP[0]);
+                transmission.push_back(cSP[1]);
+                transmission.push_back(cSP[2]);
+                transmission.push_back(',');
 
                 // P Value
                 char cPVal[3];
-                string stPVal = "";
-                stringstream cvstrSPVal;
-                cvstrSPVal << currentP;
-                stPVal = cvstrSPVal.str().c_str();
-                strcpy(cPVal,stPVal.c_str());
+                itoc(currentP,cPVal);
+                transmission.push_back(cPVal[0]);
+                transmission.push_back(cPVal[1]);
+                transmission.push_back(cPVal[2]);
+                transmission.push_back(',');                
 
                 // I Value
                 char cIVal[3];
-                string stIVal = "";
-                stringstream cvstrSIVal;
-                cvstrSIVal << currentI;
-                stIVal = cvstrSIVal.str().c_str();
-                strcpy(cIVal,stIVal.c_str());
+                itoc(currentI,cIVal);
+                transmission.push_back(cIVal[0]);
+                transmission.push_back(cIVal[1]);
+                transmission.push_back(cIVal[2]);
+                transmission.push_back(',');                  
 
                 // D Value
-		char cDVal[3];
-                string stDVal = "";
-                stringstream cvstrSDVal;
-                cvstrSDVal << currentD;
-                stDVal = cvstrSDVal.str().c_str();
-                strcpy(cDVal,stDVal.c_str());
+                char cDVal[3];
+                itoc(currentD,cDVal);
+                transmission.push_back(cDVal[0]);
+                transmission.push_back(cDVal[1]);
+                transmission.push_back(cDVal[2]);
+                transmission.push_back(',');  
+                
+                
+                transmission.push_back('!'); 
+                
 
-		// Comp Value
-		char cCompVal[3];
-                string stCompVal = "";
-                stringstream cvstrSCompVal;
-                cvstrSCompVal << currentCompVal;
-                stCompVal = cvstrSCompVal.str().c_str();
-                strcpy(cCompVal,stCompVal.c_str());
 
+
+
+                
+
+
+                /*
+                for (int u = 0; u < transmission.size();u++){
+                    cout << transmission[u] << endl;
+                }
+                */
+                // SENDING THE DATA
                 // Y POSITION
-                for(int i = 0; i < strlen(cx);i++){
-                    input = cx[i];
+                for(int i = 0; i < transmission.size();i++){
+                    input = transmission[i];
                     unsigned char command[1] ={0};
                     command[0] = static_cast<unsigned char>(input);
                     write(port,buffer(command,1));
                 }
 
-		// Comma in communciation to indicate new data
-                unsigned char command[1] ={0};
-                input = ',';
-                command[0] = static_cast<unsigned char>(input);
-                write(port,buffer(command,1));
 
-                // SETPOINT
-                for(int i = 0; i < strlen(cSP);i++){
-                    input = cSP[i];
-                    unsigned char command[1] ={0};
-                    command[0] = static_cast<unsigned char>(input);
-                    write(port,buffer(command,1));
-                }
-
-		// Comma in communciation to indicate new data
-	        input = ',';
-                command[0] = static_cast<unsigned char>(input);
-                write(port,buffer(command,1));
-
-                // P VALUE
-                for(int i = 0; i < strlen(cPVal);i++){
-                    input = cPVal[i];
-                    unsigned char command[1] ={0};
-                    command[0] = static_cast<unsigned char>(input);
-                    write(port,buffer(command,1));
-                }
-
-                // Comma in communciation to indicate new data
-                input = ',';
-                command[0] = static_cast<unsigned char>(input);
-                write(port,buffer(command,1));
-
-                // I VALUE
-                for(int i = 0; i < strlen(cIVal);i++){
-                    input = cIVal[i];
-                    unsigned char command[1] ={0};
-                    command[0] = static_cast<unsigned char>(input);
-                    write(port,buffer(command,1));
-                }
-
-                // Comma in communciation to indicate new data
-                input = ',';
-                command[0] = static_cast<unsigned char>(input);
-                write(port,buffer(command,1));
-
-                // D VALUE
-                for(int i = 0; i < strlen(cDVal);i++){
-                    input = cDVal[i];
-                    unsigned char command[1] ={0};
-                    command[0] = static_cast<unsigned char>(input);
-                    write(port,buffer(command,1));
-                }
-
-		// Comma in communciation to indicate new data
-	        input = ',';
-                command[0] = static_cast<unsigned char>(input);
-                write(port,buffer(command,1));
-
-                // COMP VALUE
-                for(int i = 0; i < strlen(cCompVal);i++){
-                    input = cCompVal[i];
-                    unsigned char command[1] ={0};
-                    command[0] = static_cast<unsigned char>(input);
-                    write(port,buffer(command,1));
-                }
-
-                // END OF TRANSMITION
-                input = '!';
-                command[0] = static_cast<unsigned char>(input);
-                write(port,buffer(command,1));
+           
+                
+                
+                //GRAB DATA
             }
+            
             else{
 
             }
-        }
-    }
+        } cout << "Exiting Serial Comms while loop" << endl;
+    } cout << "Exiting Serial Comms" << endl;
+    
 }
 
 void visualcontrol()
@@ -379,12 +370,13 @@ void visualcontrol()
                 //calculate the position of the marker
                 int posX = dM10 / dArea;
                 int posY = dM01 / dArea;
-                float output_start = 1;
-                float output_end = 100;
-                float input_start = 390;
-                float input_end = 120;
-                currentPos[x] = (int)(output_start + ((output_end - output_start) / (input_end - input_start)) * (posY - input_start));
-                cout<< currentPos[0] << endl;
+                float output_startY = 1;
+                float output_endY = 100;
+                float input_startY = 390;
+                float input_endY = 120;
+                //currentPosY[x] = (int)(output_startY + ((output_endY - output_startY) / (input_endY - input_startY)) * (posY - input_startY));
+                currentPosY[x] = posY;
+                currentPosX[x] = posX;
                 iLastX[x] = posX;
                 iLastY[x] = posY;
                 imgLines = Scalar(5, 10, 15);
@@ -399,9 +391,7 @@ void visualcontrol()
 
                 }
                 if(logdata){
-                    std::string currentdata = to_string(x);
-                    currentdata.append(" ");
-                    currentdata.append(to_string(currentPos[x]));
+                    std::string currentdata = to_string(currentPosY[0]);
                     currentdata.append(" ");
                     currentdata.append(to_string(currentSetpoint));
                     currentdata.append("\n");
@@ -414,7 +404,17 @@ void visualcontrol()
             std::string windowName = oss.str();
             imshow(windowName, imgThresholded[x]); //show the thresholded image
             imgOriginal = imgOriginal + imgLines;
-                    
+            //cout<< currentPosY[x] << endl;
+            
+            if (x == 0){
+                cout << "Red: " << currentPosY[0] << ',' << currentPosX[0] << endl;
+            } 
+            else if (x == 1){
+                cout << "Blue: " << currentPosY[1] << ',' << currentPosX[1] << endl;
+            }  
+            else if (x == 2){
+                cout << "Green: " << currentPosY[2] << ',' << currentPosX[2] << endl;
+            }   
         }	
         imshow("Original", imgOriginal); //show the original image
 
@@ -433,6 +433,8 @@ void visualcontrol()
             myfile.open ("log.txt",ios::out);
             myfile << logged_data;
             myfile.close();
+            logged_data = "";
+            logdata = false;
         }
 
     }
