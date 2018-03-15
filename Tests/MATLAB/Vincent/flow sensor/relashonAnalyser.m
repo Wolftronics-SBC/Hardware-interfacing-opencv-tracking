@@ -1,6 +1,4 @@
-function relashonAnalyser( data , maxSize )
-
-coeffientsNum = 2;
+function peak = relashonAnalyser( data , minSize , color , useMedi)
 
 shiftdata = data - data(1);
 
@@ -10,21 +8,39 @@ for n = 1:4
     binomialCoeff = conv(binomialCoeff,h);
 end
 
-fDelay = (length(binomialCoeff)-1)/2;
+binomialMA = filter(binomialCoeff, 1, shiftdata);
+binomialMA = binomialMA + data(1);
 
-binomiaMA = filter(binomialCoeff, 1, shiftdata);
+for i = 1:1:length(data)
+    datatime(i) = sum(data(1:i)*10^-6);
+end
 
-binomiaMA = binomiaMA + data(1);
+for i = 1:1:length(binomialMA)
+    binomialtime(i) = sum(binomialMA(1:i)*10^-6);
+end
 
-y = transpose(1:1:length(binomiaMA));
-p = polyfit(y,binomiaMA,coeffientsNum);
-ymax = transpose(1:1:maxSize);
-fitted = polyval(p,ymax);
+for i = 1:1:length(binomialMA)
+    DPS(i) = 90/(binomialMA(i)*10^-6);
+end
+
+DPSmedi = medfilt1(DPS,100);
+
+DPSdifferential = diff(DPS(:))./diff(binomialtime(:));
 
 hold on
-plot (data)
-plot (binomiaMA)
-plot (fitted)
+grid on
+%plot (datatime, data,'--','color',color)
+%plot (binomialtime,binomialMA,'color',color)
+plot (binomialtime,DPS,'--','color',color)
+%plot (binomialtime,DPSmedi,'color',color)
+
+ if useMedi
+     DPSdifferential = medfilt1(DPSdifferential,100);
+     plot (binomialtime(2:end),DPSdifferential,'color',color)
+ else
+     plot (binomialtime(2:end),DPSdifferential,'color',color)
+ end
+ peak = max(DPSdifferential);
 
 end
 
