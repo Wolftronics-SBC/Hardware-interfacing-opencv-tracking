@@ -7,6 +7,7 @@
 Timer timerSerial;
 Timer timerDrive;
 Timer timerControl;
+Timer timerData;
 
 //pins
 // solinoids
@@ -54,6 +55,11 @@ bool butt1LastState = false;
 //control variables
 volatile double target = 0;
 volatile double current = 0;
+volatile double current1 = 0;
+volatile double current2 = 0;
+volatile double currentx = 0;
+volatile double currentx1 = 0;
+volatile double currentx2 = 0;
 double output = 0;
 double Kp = 5;
 double Ki = 0;
@@ -108,6 +114,7 @@ void setup() {
   pinMode (butt1,INPUT_PULLUP);
   pinMode (butt2,INPUT_PULLUP);
 
+  pinMode (40,OUTPUT);
   
   //set stepper speed
   flowStep1.setSpeed(motorSpeed);
@@ -119,9 +126,10 @@ void setup() {
   timerSerial.every(10, serial);
   timerDrive.every(50, drive);
   timerControl.every(400, control);
+  timerData.every(40, data);
 
   //setup serial
-  Serial.begin(9600);
+  Serial.begin(38400);
   Serial1.begin(9600);
   Serial2.begin(9600);
 
@@ -140,11 +148,28 @@ void loop() {
   timerSerial.update();
   timerDrive.update();
   timerControl.update();
+  timerData.update();
 
     if (stringComplete) {
+      
       inputString.remove(inputString.indexOf('!'));
       
+      currentx = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      currentx1 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      currentx2 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+
       current = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      current1 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      current2 = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
       target = inputString.substring(0,inputString.indexOf(',')).toInt();
@@ -156,32 +181,32 @@ void loop() {
       int tempKi = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
-      int tempKd = inputString.substring(0,inputString.indexOf(',')).toInt();
-      inputString.remove(0,inputString.indexOf(',')+1);
+      //int tempKd = inputString.substring(0,inputString.indexOf(',')).toInt();
+      //inputString.remove(0,inputString.indexOf(',')+1);
       
-      int tempReverseConst1 = inputString.toInt();
+      int tempKd = inputString.toInt();
       
       Kp = (double)tempKp/10;
       Ki = (double)tempKi/10;
       Kd = (double)tempKd/10;
-      reverseConst1 = (double)tempReverseConst1/10;
+      //reverseConst1 = (double)tempReverseConst1/10;
       
-      //Serial1.print("current ");
       //Serial1.println(current);
-      //Serial1.print("target ");
+      //Serial1.println(',');
       //Serial1.println(target);
-      //Serial1.print("tempKp ");
-     // Serial1.println(tempKp);
-      //Serial1.print("tempKi ");
+      //Serial1.println(',');
+      //Serial1.println(tempKp);
+      //Serial1.println(',');
       //Serial1.println(tempKi);
-      //Serial1.print("tempKd ");
+      //Serial1.println(',');
       //Serial1.println(tempKd);
-      //Serial1.print("output ");
+      //Serial1.println(',');
       //Serial1.println(output);
-      //Serial1.print("reverseConst1 ");
-     // Serial1.println(reverseConst1);
-      //Serial1.println(9999999);
-      
+      //Serial1.println(',');
+      //Serial1.println(reverseConst1);
+      //Serial1.println('!');
+
+  
       // clear the string:
       inputString = "";
       stringComplete = false;
@@ -256,17 +281,7 @@ void loop() {
         digitalWrite(sol4inf, 0);
         delay(50);
     }
-      sensor1Value = analogRead(sensor1Pin);
-  sensor2Value = analogRead(sensor2Pin);
-  Serial1.println(sensor1Value);
-    Serial1.println(',');
 
-    Serial1.println(sensor2Value);
-        Serial1.println(',');
-
-  Serial1.println(current);
-  
-  Serial1.println('!');
 
   }
 
@@ -392,6 +407,34 @@ void control(){
    flowStep2Target = (int)(output);
    //flowStep1Target = (int)(Kp*(double)(abs(current - target)));
    //Serial2.println((int)(Kp*(double)(abs(current - target))));
+   
+        //sensor1Value = analogRead(sensor1Pin);
+        //sensor2Value = analogRead(sensor2Pin);
 
+
+         //if(current2 > 20) digitalWrite(40, true);
+         //else digitalWrite(40, false);
+}
+
+void data(){
+           Serial1.println(current);
+            Serial1.println(',');
+
+         Serial1.println(current1);
+            Serial1.println(',');
+
+         Serial1.println(current2);
+            Serial1.println(',');
+                  
+         Serial1.println(currentx);
+            Serial1.println(',');
+
+         Serial1.println(currentx1);
+            Serial1.println(',');
+            
+         Serial1.println(currentx2);
+            Serial1.println(',');
+  
+         Serial1.println('!');
 }
 

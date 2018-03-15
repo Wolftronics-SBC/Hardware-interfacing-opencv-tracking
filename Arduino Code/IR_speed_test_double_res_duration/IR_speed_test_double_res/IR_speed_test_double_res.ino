@@ -17,7 +17,7 @@ void setup()
   pinMode(dataIN,INPUT);       
   prevmillis = 0;
   prevstate = LOW;  
-  Serial.begin(9600);
+  Serial.begin(38400);
   currentstate = digitalRead(dataIN);
   prevstate = currentstate;
 }
