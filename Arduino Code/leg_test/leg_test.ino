@@ -4,7 +4,9 @@
 #include <Timer.h>
 
 //timers
+Timer timerSerial;
 Timer timerDrive;
+Timer timerData;
 
 //pins
 // solinoids
@@ -40,6 +42,23 @@ Timer timerDrive;
 //button variables
 bool butt1State = false;
 bool butt2State = false;
+
+//control variables
+volatile double target = 0;
+volatile double current = 0;
+volatile double current1 = 0;
+volatile double current2 = 0;
+volatile double currentx = 0;
+volatile double currentx1 = 0;
+volatile double currentx2 = 0;
+double output = 0;
+double Kp = 5;
+double Ki = 0;
+double Kd = 0;
+
+//serial variables
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
 
 //drive variables
 volatile bool inf1 = false;
@@ -90,8 +109,13 @@ void setup() {
   flowStep4.setSpeed(motorSpeed);
 
   //setup timers
+  timerSerial.every(10, serial);
   timerDrive.every(50, drive);
+  timerData.every(40, data);
 
+    //setup serial
+  Serial.begin(38400);
+  Serial1.begin(9600);
 
   //button reading setup
   butt1State = digitalRead(butt1);
@@ -105,7 +129,51 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  timerSerial.update();
   timerDrive.update();
+  timerData.update();
+
+  if (stringComplete) {
+      
+      inputString.remove(inputString.indexOf('!'));
+      
+      currentx = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      currentx1 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      currentx2 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+
+      current = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      current1 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      current2 = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      target = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      int tempKp = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      int tempKi = inputString.substring(0,inputString.indexOf(',')).toInt();
+      inputString.remove(0,inputString.indexOf(',')+1);
+      
+      int tempKd = inputString.toInt();
+      
+      Kp = (double)tempKp/10;
+      Ki = (double)tempKi/10;
+      Kd = (double)tempKd/10;
+      
+      // clear the string:
+      inputString = "";
+      stringComplete = false;
+    }
 
     //get steppers to inital positions
     butt1State = digitalRead(butt1);
@@ -187,3 +255,52 @@ void drive(){
   
 }
 
+//get serial data for target and current position
+void serial(){
+  
+  Serial.println("A");
+
+}
+
+/*
+  SerialEvent occurs whenever a new data comes in the
+ hardware serial RX.  This routine is run between each
+ time loop() runs, so using delay inside loop can delay
+ response.  Multiple bytes of data may be available.
+ */
+void serialEvent() {
+  while (Serial.available()) {
+
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    inputString += inChar;
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+        if (inChar == '!') {
+      stringComplete = true;
+        }
+  }
+}
+
+void data(){
+         Serial1.println(current);
+            Serial1.println(',');
+
+         Serial1.println(current1);
+            Serial1.println(',');
+
+         Serial1.println(current2);
+            Serial1.println(',');
+                  
+         Serial1.println(currentx);
+            Serial1.println(',');
+
+         Serial1.println(currentx1);
+            Serial1.println(',');
+            
+         Serial1.println(currentx2);
+            Serial1.println(',');
+  
+         Serial1.println('!');
+}
