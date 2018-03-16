@@ -158,15 +158,12 @@ void loop() {
       int tempKi = inputString.substring(0,inputString.indexOf(',')).toInt();
       inputString.remove(0,inputString.indexOf(',')+1);
       
-      int tempKd = inputString.substring(0,inputString.indexOf(',')).toInt();
-      inputString.remove(0,inputString.indexOf(',')+1);
-      
-      int tempReverseConst1 = inputString.toInt();
+      int tempKd = inputString.toInt();
       
       Kp = (double)tempKp/10;
       Ki = (double)tempKi/10;
       Kd = (double)tempKd/10;
-      reverseConst1 = (double)tempReverseConst1/10;
+      //reverseConst1 = (double)tempReverseConst1/10;
       
       // clear the string:
       inputString = "";
