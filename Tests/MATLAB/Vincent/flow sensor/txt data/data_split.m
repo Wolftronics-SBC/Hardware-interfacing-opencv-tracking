@@ -1,4 +1,4 @@
-function [ dur , pos ] = data_split( data )
+function [ both ] = data_split( data )
 
 dur = [0,0,0,0,0,0,0];
 pos = [0,0,0,0,0,0,0];
@@ -12,6 +12,8 @@ end
 
 dur = dur(2:end,1:2);
 pos = pos(2:end,:);
+
+both = {dur , pos };
 
 end
 

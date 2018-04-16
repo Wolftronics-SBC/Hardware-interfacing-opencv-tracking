@@ -1,4 +1,4 @@
-function flowFinder( lpm18psi30 , lpm20psi30 , lpm22psi30 , lpm25psi30 , lpm27psi40 , lpm30psi40 , lpm34psi50 , newData )
+function flowFinder( lpm18psi30 , lpm20psi30 , lpm22psi30 , lpm25psi30 , lpm27psi40 , lpm30psi40 , lpm34psi50 , newData , psi )
 %UNTITLED4 Summary of this function goes here
 %   Detailed explanation goes here
 figure;
@@ -30,7 +30,7 @@ xlabel('max acceleration (degrees per second per second)');
 ylabel('flow rate (LPM)');
 title('flow rate vs maximum acceleration')
 legend({'real world data points' 'polyfit line equation'})
-subplot(1,3,3)
+figure
 %minsize = min([length(leg50psi0g),length(leg50psi300g),length(leg50psi600g)]);
 %relashonAnalyser( leg50psi0g , minsize , 'b' , false )
 newDataPeak = relashonAnalyser( newData , length(newData) , 'b' , false );
@@ -38,8 +38,17 @@ ylim(limitsy)
 %xlim(limitsx)
 xlabel('Sample Time (seconds)');
 ylabel('speed (degrees per second)');
-title({'speed (dashed)in DPS and acceleration (solid) in DPSPS';'of data being tested';['flow of new data at max is ' num2str(polyval(coefficients,newDataPeak)) 'LPM']});
-disp(['flow of new data at max is ' num2str(polyval(coefficients,newDataPeak)) 'LPM']);
+
+flowRate = polyval(coefficients,newDataPeak);
+
+airVolume = (sum(newData*10^-6)/60) * flowRate * 0.001;
+
+work = psi * 6894.76 * airVolume;
+
+title({'speed (dashed) in DPS and acceleration (solid) in DPSPS';['Maximum Flow is ' num2str(flowRate) ' LPM, Energy Expended is ' num2str(work) ' Joules']});
+disp(['flow of new data at max is ' num2str(flowRate) ' LPM']);
+disp('work done to compress air is ')
+disp([num2str(work) ' Joules']);
 
 
 end
