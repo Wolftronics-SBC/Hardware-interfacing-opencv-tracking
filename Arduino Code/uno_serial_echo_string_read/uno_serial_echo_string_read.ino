@@ -17,8 +17,11 @@ void loop() {
 
     int sensor2Value = inputString.substring(0,inputString.indexOf(',')).toInt();
     inputString.remove(0,inputString.indexOf(',')+1);
+
+    int current = inputString.substring(0,inputString.indexOf(',')).toInt();
+    inputString.remove(0,inputString.indexOf(',')+1);
       
-    int current = inputString.toInt();
+    int target = inputString.toInt();
 
     Serial.print(sensor1Value);
     Serial.print(",");
